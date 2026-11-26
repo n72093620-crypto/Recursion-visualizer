@@ -1,0 +1,203 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>RecursionVerse 3D</title><meta name="color-scheme" content="dark">
+<style>
+:root{color-scheme:dark;--bg:#07050f;--p:#a855f7;--b:#3b82f6;--g:#10d9a0;--t:#ece9ff;--m:#9a96c4;--card:rgba(22,16,50,.72);--ln:rgba(139,92,246,.38);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--t);font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:radial-gradient(1100px 650px at 15% -10%,#2c1366 0,transparent 60%),radial-gradient(900px 600px at 100% 0,#0d2c70 0,transparent 55%),var(--bg)}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:14px 20px}
+h1{margin:0;font-size:1.5rem;letter-spacing:.5px;background:linear-gradient(90deg,#c084fc,#60a5fa);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 12px rgba(168,85,247,.55))}
+h1 small{display:block;font-size:.72rem;color:var(--m);-webkit-text-fill-color:var(--m);letter-spacing:0;font-weight:400}
+nav{display:flex;flex-wrap:wrap;gap:6px}
+button,select{font:inherit;color:var(--t);background:rgba(40,28,90,.6);border:1px solid var(--ln);border-radius:10px;padding:7px 13px;cursor:pointer;transition:.18s}
+button:hover:not(:disabled){border-color:var(--p);box-shadow:0 0 14px rgba(168,85,247,.5)}button:disabled{opacity:.35;cursor:default}
+button.on{background:linear-gradient(135deg,#7c3aed,#2563eb);border-color:#a78bfa;box-shadow:0 0 16px rgba(124,58,237,.65)}
+main{display:grid;grid-template-columns:minmax(0,1fr) 410px;gap:16px;padding:0 20px 24px;max-width:1500px;margin:auto}
+.card{background:var(--card);border:1px solid var(--ln);border-radius:16px;backdrop-filter:blur(10px);box-shadow:0 0 30px rgba(91,52,200,.18)}
+#stage{display:flex;flex-direction:column;gap:12px;min-width:0}
+#cv{position:relative;height:clamp(330px,60vh,620px);overflow:hidden}#cv canvas{display:block;width:100%;height:100%;touch-action:pan-y;cursor:grab}
+#leg{position:absolute;top:10px;left:12px;font-size:.76rem;color:var(--m);display:flex;flex-wrap:wrap;gap:4px 12px;pointer-events:none}
+#leg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;box-shadow:0 0 8px currentColor}
+#hint{position:absolute;right:12px;bottom:8px;font-size:.7rem;color:var(--m);pointer-events:none}
+#msg{padding:14px 16px;min-height:76px;border-left:3px solid var(--p)}#msg b{color:#c4b5fd}
+#ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 12px}#ctl .main{background:linear-gradient(135deg,#7c3aed,#2563eb);min-width:96px}
+#sl{flex:1;min-width:120px;accent-color:#8b5cf6}label{color:var(--m);font-size:.85rem}
+#side{display:flex;flex-direction:column;gap:12px;min-width:0}#intro{padding:14px 16px}#intro h3{margin:0 0 6px;color:#c4b5fd}#intro p{margin:0;color:#cfcaf5}
+.cd{margin-top:8px;padding:8px 10px;border-radius:10px;border:1px solid;font-size:.88rem}
+#code{padding:10px}#lt{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+pre{margin:0;font:13px/1.8 ui-monospace,Menlo,Consolas,monospace;overflow-x:auto}pre div{padding:0 10px;border-radius:6px;white-space:pre;border-left:3px solid transparent;color:#bdb8e8}
+pre div span{display:inline-block;width:22px;color:#6a6499;user-select:none}
+pre div.on{background:linear-gradient(90deg,rgba(124,58,237,.5),rgba(37,99,235,.18));border-left-color:#c084fc;color:#fff;box-shadow:0 0 14px rgba(168,85,247,.45)}
+#quiz{display:none;padding:26px;max-width:760px;margin:0 auto}#quiz h2{margin:.3em 0 1em}.qh{color:var(--m)}
+.opt{display:block;width:100%;text-align:left;margin:8px 0;padding:12px 14px}.opt.ok{background:rgba(16,217,160,.25);border-color:var(--g)}.opt.no{background:rgba(239,68,68,.25);border-color:#ef4444}
+#qe{min-height:3em;color:#cfcaf5}
+body.q main{grid-template-columns:1fr}body.q #stage,body.q #side{display:none}body.q #quiz{display:block}
+@media(max-width:960px){main{grid-template-columns:1fr;padding:0 12px 20px}header{padding:12px}}
+</style></head><body>
+<header><h1>RecursionVerse 3D<small>See how a function calling itself really works</small></h1>
+<nav id="tabs"><button data-m="learn">1 · Learn</button><button data-m="fact">2 · Factorial</button><button data-m="fib">3 · Fibonacci</button><button data-m="hanoi">4 · Hanoi</button><button data-m="quiz">5 · Quiz</button></nav></header>
+<main>
+<section id="stage">
+<div id="cv" class="card"><div id="leg"><span><i style="color:#8b5cf6;background:#8b5cf6"></i>Running call (recursive case)</span><span><i style="color:#10d9a0;background:#10d9a0"></i>Base case: stop!</span><span><i style="color:#3b82f6;background:#3b82f6"></i>Returning an answer</span></div><div id="hint">Drag to rotate · scroll to zoom</div></div>
+<div id="msg" class="card"></div>
+<div id="ctl" class="card"><button id="rs">⏮ Restart</button><button id="pv">◀ Prev</button><button id="pl" class="main">▶ Play</button><button id="nx">Next ▶</button><input type="range" id="sl" min="0" value="0" aria-label="Step"><select id="spd" aria-label="Speed"><option value="0">Slow</option><option value="1" selected>Normal</option><option value="2">Fast</option></select><label><span id="szl">Input</span> <select id="sz"></select></label></div>
+</section>
+<aside id="side"><div id="intro" class="card"></div><div id="code" class="card"><div id="lt"><button data-l="cpp">C++</button><button data-l="java">Java</button><button data-l="py">Python</button><button data-l="js">JavaScript</button></div><pre id="pre"></pre></div></aside>
+<section id="quiz" class="card"></section>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const $=s=>document.querySelector(s),COL={p:0x8b5cf6,g:0x10d9a0,b:0x3b82f6},DL=[1900,1100,450];
+const J=(h,b)=>[h,...b,'}'].join('\n');
+const FB=["  if (n <= 1)","    return 1;  // base case","  return n * fact(n - 1);  // recursive case"];
+const IB=["  if (n <= 1)","    return n;  // base case","  return fib(n - 1) + fib(n - 2);  // two calls"];
+const HB=["  if (n == 0) return;  // base case","  hanoi(n - 1, a, c, b);  // park n-1 disks","  move(n, a, b);  // move the big disk","  hanoi(n - 1, c, b, a);  // stack n-1 on top"];
+const CODE={
+learn:{cpp:J("void countdown(int n) {",["  if (n == 0)",'    { cout << "Liftoff!"; return; }',"  cout << n << endl;","  countdown(n - 1);"]),
+java:J("static void countdown(int n) {",["  if (n == 0)",'    { System.out.println("Liftoff!"); return; }',"  System.out.println(n);","  countdown(n - 1);"]),
+py:'def countdown(n):\n  if n == 0:\n    print("Liftoff!"); return\n  print(n)\n  countdown(n - 1)\n# call finished',
+js:J("function countdown(n) {",["  if (n === 0)",'    { console.log("Liftoff!"); return; }',"  console.log(n);","  countdown(n - 1);"])},
+fact:{cpp:J("int fact(int n) {",FB),java:J("static int fact(int n) {",FB),js:J("function fact(n) {",FB),py:'def fact(n):\n  if n <= 1:\n    return 1  # base case\n  return n * fact(n - 1)  # recursive case\n# done'},
+fib:{cpp:J("int fib(int n) {",IB),java:J("static int fib(int n) {",IB),js:J("function fib(n) {",IB),py:'def fib(n):\n  if n <= 1:\n    return n  # base case\n  return fib(n - 1) + fib(n - 2)  # two calls\n# done'},
+hanoi:{cpp:J("void hanoi(int n, char a, char b, char c) {",HB),java:J("static void hanoi(int n, char a, char b, char c) {",HB),js:J("function hanoi(n, a, b, c) {",HB),py:'def hanoi(n, a, b, c):\n  if n == 0: return  # base case\n  hanoi(n - 1, a, c, b)  # park n-1 disks\n  move(n, a, b)  # move the big disk\n  hanoi(n - 1, c, b, a)  # stack n-1 on top\n# done'}};
+const INTRO={
+learn:`<h3>What is recursion?</h3><p>Recursion means solving a problem by asking a smaller copy of the same problem, again and again, until it is easy.</p><div class="cd" style="border-color:#a855f7">🔁 <b>Recursion</b>: a function that calls itself, like opening Russian dolls.</div><div class="cd" style="border-color:#10d9a0">🛑 <b>Base case</b>: the smallest problem we can answer directly. It tells us when to STOP.</div><div class="cd" style="border-color:#8b5cf6">🔄 <b>Recursive case</b>: everything else. Shrink the problem and call yourself again.</div>`,
+fact:`<h3>Factorial: 5! = 5×4×3×2×1</h3><p>The trick: n! = n × (n−1)!. Each call waits for a smaller one. Watch the boxes pile up on the call stack, then the answers flow back down.</p>`,
+fib:`<h3>Fibonacci tree</h3><p>Each number is the sum of the two before it, so fib(n) calls itself <b>twice</b> and the calls branch like a tree. Purple nodes are waiting, green nodes hit the base case, blue nodes found their answer.</p>`,
+hanoi:`<h3>Tower of Hanoi</h3><p>Move every disk from peg A to peg C. Move one disk at a time and never put a big disk on a small one. The recursive trick: park n−1 disks, move the big one, then stack the n−1 disks back on top.</p>`};
+const SZ={learn:{o:[2,3,4,5],d:3,f:v=>`countdown(${v})`},fact:{o:[3,4,5,6],d:5,f:v=>v+'!'},fib:{o:[3,4,5],d:4,f:v=>`fib(${v})`},hanoi:{o:[2,3,4],d:3,f:v=>v+' disks'}};
+const mkP=()=>{const S=[],st=[];return{S,st,top:()=>st[st.length-1]}};
+const GEN={
+learn(n){const{S,st,top}=mkP(),P=(l,t)=>S.push({line:l,text:t,st:st.map(f=>({...f}))});
+(function r(k){st.push({t:`countdown(${k})`,c:'p'});P(0,`We call countdown(${k}). A new box, called a frame, is placed on top of the call stack.`);
+P(1,`Is ${k} equal to 0? ${k?'No, so we use the recursive case.':'Yes! This is the BASE CASE, the signal to stop.'}`);
+if(!k){top().c='g';P(2,'Base case: print “Liftoff!” and return. No new call is made, so the chain of calls ends here.')}
+else{P(3,`Print ${k}.`);P(4,`Recursive case: countdown calls itself with a smaller number, countdown(${k-1}).`);r(k-1);top().c='b'}
+P(5,`countdown(${k}) is finished, so its frame is removed from the stack.`);st.pop()})(n);
+return{steps:S,init:{text:`Press ▶ Play or Next to start. We will count down from ${n} using recursion.`,st:[]}}},
+fact(n){const{S,st,top}=mkP(),P=(l,t)=>S.push({line:l,text:t,st:st.map(f=>({...f}))});
+const f=k=>{st.push({t:`fact(${k})`,c:'p'});P(0,`Call fact(${k}). A new frame is pushed onto the stack.`);
+P(1,`Is ${k} ≤ 1? ${k<=1?'Yes, BASE CASE! We know 1! = 1.':'No, so we use the recursive case.'}`);let r;
+if(k<=1){r=1;top().c='g';top().v=1;P(2,'Base case reached: return 1 right away. Now the waiting calls can finish, one by one.')}
+else{P(3,`fact(${k}) = ${k} × fact(${k-1}). It has to wait for fact(${k-1}) first.`);const a=f(k-1);r=k*a;top().c='b';top().v=r;P(3,`fact(${k-1}) returned ${a}. So fact(${k}) = ${k} × ${a} = ${r}. Return it.`)}
+st.pop();return r};f(n);
+return{steps:S,init:{text:`Press ▶ Play or Next to start. We will compute ${n}! with recursion.`,st:[]}}},
+fib(N){const{S,st,top}=mkP(),nodes=[],ns=[],vl=[];let lf=0;
+const P=(l,t,a)=>S.push({line:l,text:t,act:a,st:st.map(f=>({...f})),ns:ns.slice(),vl:vl.slice()});
+const f=(k,d)=>{const id=nodes.length,nd={k,d,x:0,p:-1};nodes.push(nd);ns[id]=1;st.push({t:`fib(${k})`,c:'p'});
+P(0,`Call fib(${k}). A new node grows in the tree and a frame lands on the stack.`,id);
+P(1,`Is ${k} ≤ 1? ${k<=1?'Yes, BASE CASE!':'No, so it splits into two smaller calls.'}`,id);let r;
+if(k<=1){r=k;nd.x=lf++;ns[id]=4;top().c='g';top().v=r;vl[id]=r;P(2,`Base case: fib(${k}) is simply ${k}. Return it.`,id)}
+else{ns[id]=2;P(3,`fib(${k}) = fib(${k-1}) + fib(${k-2}). Solve fib(${k-1}) first.`,id);
+const c1=nodes.length,a=f(k-1,d+1);nodes[c1].p=id;P(3,`fib(${k-1}) gave ${a}. Now solve fib(${k-2}).`,id);
+const c2=nodes.length,b=f(k-2,d+1);nodes[c2].p=id;r=a+b;nd.x=(nodes[c1].x+nodes[c2].x)/2;ns[id]=3;vl[id]=r;top().c='b';top().v=r;
+P(3,`Both answers are in: ${a} + ${b} = ${r}. Return ${r} to the caller.`,id)}
+st.pop();return r};f(N,0);
+return{steps:S,nodes,N,init:{text:`Press ▶ Play or Next to start. We will grow the call tree for fib(${N}).`,st:[],ns:[],vl:[]}}},
+hanoi(n){const{S,st,top}=mkP(),Pg=[[],[],[]],nm='ABC';for(let i=n;i>0;i--)Pg[0].push(i);const init=Pg.map(a=>a.slice());
+const P=(l,t)=>S.push({line:l,text:t,st:st.map(f=>({...f})),P:Pg.map(a=>a.slice())});
+(function h(k,a,b,c){st.push({t:`hanoi(${k},${nm[a]}→${nm[b]})`,c:'p'});P(0,`Call hanoi(${k}) to move ${k} disk(s) from ${nm[a]} to ${nm[b]}, using ${nm[c]} as the spare.`);
+if(!k){top().c='g';P(1,'No disks left: BASE CASE. Nothing to move, so return.');st.pop();return}
+P(1,`${k} disk(s) to move, so we use the recursive case.`);
+P(2,`First, move the top ${k-1} disk(s) out of the way: ${nm[a]} → ${nm[c]}.`);h(k-1,a,c,b);
+Pg[b].push(Pg[a].pop());P(3,`Now the biggest of these disks, disk ${k}, is free. Move it ${nm[a]} → ${nm[b]}.`);
+P(4,`Finally, move the ${k-1} parked disk(s) from ${nm[c]} onto disk ${k}.`);h(k-1,c,b,a);
+top().c='b';P(5,`hanoi(${k}) is done and returns.`);st.pop()})(n,0,2,1);
+return{steps:S,P:init,init:{text:`Press ▶ Play or Next to start. Goal: move all ${n} disks from A to C.`,st:[],P:init}}}};
+// ---------- 3D ----------
+const cv=$('#cv'),R=new THREE.WebGLRenderer({antialias:true,alpha:true});R.setPixelRatio(Math.min(devicePixelRatio,2));cv.appendChild(R.domElement);
+const sc=new THREE.Scene();sc.fog=new THREE.FogExp2(0x07050f,.012);const cam=new THREE.PerspectiveCamera(50,1,.1,200);
+sc.add(new THREE.AmbientLight(0x7766bb,.9));const L1=new THREE.PointLight(0xa855f7,2.4,90),L2=new THREE.PointLight(0x3b82f6,2.4,90);L1.position.set(-10,12,10);L2.position.set(12,6,8);sc.add(L1,L2);
+const sp=new Float32Array(1800).map(()=>(Math.random()-.5)*120);
+const stars=new THREE.Points(new THREE.BufferGeometry().setAttribute('position',new THREE.BufferAttribute(sp,3)),new THREE.PointsMaterial({color:0xb9a5ff,size:.2,transparent:true,opacity:.8}));sc.add(stars);
+const grid=new THREE.GridHelper(80,40,0x7c3aed,0x2a1d66);grid.position.y=-7;sc.add(grid);
+const V={yaw:0,pit:.18,dist:12,tx:0,ty:0,tz:0},G={...V};let drag=null;
+const ce=R.domElement;ce.onpointerdown=e=>{drag=[e.clientX,e.clientY];ce.setPointerCapture(e.pointerId)};ce.onpointerup=()=>drag=null;
+ce.onpointermove=e=>{if(!drag)return;G.yaw-=(e.clientX-drag[0])*.006;G.pit=Math.max(-.2,Math.min(1.25,G.pit+(e.clientY-drag[1])*.005));drag=[e.clientX,e.clientY]};
+ce.addEventListener('wheel',e=>{e.preventDefault();G.dist=Math.max(6,Math.min(45,G.dist*(1+e.deltaY*.001)))},{passive:false});
+const TC={};function tex(t,w=320,h=80,fs=34){const k=t+w;if(TC[k])return TC[k];const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.font=`700 ${fs}px ui-monospace,Menlo,Consolas,monospace`;x.textAlign='center';x.textBaseline='middle';x.fillStyle='#fff';x.shadowColor='#000';x.shadowBlur=6;t.split('\n').forEach((s,i,a)=>x.fillText(s,w/2,h*(i+.5)/a.length));return TC[k]=new THREE.CanvasTexture(c)}
+const SG=new THREE.Group(),sg={x:0,y:-3,s:1};sc.add(SG);
+const FG=new THREE.BoxGeometry(3.4,.8,1.2),EG=new THREE.EdgesGeometry(FG);let stk=[],dead=[];
+const plat=new THREE.Mesh(new THREE.BoxGeometry(4.2,.3,1.8),new THREE.MeshStandardMaterial({color:0x2a1d66,emissive:0x6d28d9,emissiveIntensity:.8}));plat.position.y=-.7;SG.add(plat);
+const pl2=new THREE.Mesh(new THREE.PlaneGeometry(3.2,.8),new THREE.MeshBasicMaterial({map:tex('CALL STACK'),transparent:true}));pl2.position.set(0,-1.35,.9);SG.add(pl2);
+function mkFrame(){const g=new THREE.Group(),m=new THREE.MeshStandardMaterial({metalness:.3,roughness:.35,transparent:true,opacity:.93});g.add(new THREE.Mesh(FG,m));g.add(new THREE.LineSegments(EG,new THREE.LineBasicMaterial({color:0xd8ccff})));
+const pl=new THREE.Mesh(new THREE.PlaneGeometry(3.2,.8),new THREE.MeshBasicMaterial({transparent:true,depthWrite:false}));pl.position.z=.62;g.add(pl);SG.add(g);return{g,m,pl,k:'',i:0}}
+function syncStack(fr){while(stk.length>fr.length)dead.push(stk.pop());
+fr.forEach((f,i)=>{let o=stk[i];if(!o){o=stk[i]=mkFrame();o.g.position.y=i+5;o.g.scale.setScalar(.01)}
+const t=f.t+(f.v!=null?' = '+f.v:''),k=t+f.c;if(o.k!=k){o.k=k;o.m.color.set(COL[f.c]);o.m.emissive.set(COL[f.c]);o.pl.material.map=tex(t);o.pl.material.needsUpdate=true}
+o.i=i;o.top=i==fr.length-1})}
+// tree
+const TG=new THREE.Group(),SPH=new THREE.SphereGeometry(.6,28,18),CYL=new THREE.CylinderGeometry(.05,.05,1,6),UP=new THREE.Vector3(0,1,0);sc.add(TG);let TN=[],TS=null;
+function clearG(g){while(g.children.length)g.remove(g.children[0])}
+function buildTree(nodes,N){clearG(TG);TN=[];const mx=Math.max(...nodes.map(n=>n.x));
+nodes.forEach(n=>n.pos=new THREE.Vector3((n.x-mx/2)*1.7,((N-1)/2-n.d)*2,0));
+nodes.forEach((n,i)=>{const m=new THREE.Mesh(SPH,new THREE.MeshStandardMaterial({color:COL.p,emissive:COL.p,roughness:.3,metalness:.2}));m.position.copy(n.pos);m.scale.setScalar(.001);
+const s=new THREE.Sprite(new THREE.SpriteMaterial({transparent:true,depthTest:false}));s.scale.set(1.7,1.05,1);s.renderOrder=3;m.add(s);TG.add(m);
+let e=null;if(n.p>=0){e=new THREE.Mesh(CYL,new THREE.MeshBasicMaterial({color:0x8aa4ff}));e.visible=false;TG.add(e)}
+TN.push({m,s,e,n,p:0,k:''})})}
+function animTree(){TN.forEach((o,i)=>{const st=TS.ns[i]||0,a=TS.act==i,v=TS.vl[i];
+const s=st?(a?1.3:1):.001;o.m.scale.setScalar(o.m.scale.x+(s-o.m.scale.x)*.15);
+const c=[0,'p','p','b','g'][st]||'p';o.m.material.color.set(COL[c]);o.m.material.emissive.set(COL[c]);o.m.material.emissiveIntensity=a?1.1:.35;
+const k=st+'_'+v;if(o.k!=k){o.k=k;o.s.material.map=tex(`fib(${o.n.k})\n${v!=null?'= '+v:''}`,160,100,28);o.s.material.needsUpdate=true}
+if(o.e){o.p+=((st?1:0)-o.p)*.15;const a2=o.n.pos,b2=TN[o.n.p].n.pos,d=b2.clone().sub(a2);const L=d.length();d.normalize();
+o.e.visible=o.p>.01;o.e.quaternion.setFromUnitVectors(UP,d.clone().negate());o.e.scale.y=Math.max(L*o.p,.001);o.e.position.copy(b2).addScaledVector(d,-L*o.p/2)}})}
+// hanoi
+const HG=new THREE.Group(),PX=[-4,0,4];let HD=[];sc.add(HG);
+function buildHanoi(n,P){clearG(HG);HD=[];const bm=new THREE.MeshStandardMaterial({color:0x2a1d66,emissive:0x6d28d9,emissiveIntensity:.6,metalness:.4,roughness:.4});
+const b=new THREE.Mesh(new THREE.BoxGeometry(13,.4,3),bm);b.position.y=-1.2;HG.add(b);
+PX.forEach((x,i)=>{const p=new THREE.Mesh(new THREE.CylinderGeometry(.12,.12,4.4,16),new THREE.MeshStandardMaterial({color:0xc4b5fd,emissive:0x8b5cf6,emissiveIntensity:.7}));p.position.set(x,1.2,0);HG.add(p);
+const s=new THREE.Sprite(new THREE.SpriteMaterial({map:tex('ABC'[i],96,96,60),transparent:true}));s.position.set(x,-2.2,.8);s.scale.set(1.2,1.2,1);HG.add(s)});
+for(let k=1;k<=n;k++){const r=.7+.38*k,c=new THREE.Color().setHSL(.75-.2*(k-1)/Math.max(1,n-1),.9,.55),d=new THREE.Mesh(new THREE.CylinderGeometry(r,r,.44,40),new THREE.MeshStandardMaterial({color:c,emissive:c,emissiveIntensity:.45,metalness:.3,roughness:.3}));HG.add(d);HD[k]=d}
+setPegs(P,true)}
+function setPegs(P,now){P.forEach((a,p)=>a.forEach((k,idx)=>{const d=HD[k];d.userData.t={x:PX[p],y:-1+.22+idx*.46};if(now)d.position.set(PX[p],-1+.22+idx*.46,0)}))}
+function animHanoi(){HD.forEach(d=>{if(!d)return;const t=d.userData.t,p=d.position,dx=t.x-p.x;
+if(Math.abs(dx)>.06){if(p.y<4.2)p.y+=(4.6-p.y)*.18;else p.x+=dx*.16}else{p.x=t.x;p.y+=(t.y-p.y)*.18}})}
+// ---------- app ----------
+let M='',steps=[],init={},gen={},i=-1,playing=false,last=0,lang='cpp';
+const CFG={learn:{g:{dist:12,ty:-.6,pit:.15},sg:{x:0,y:-3,s:1}},fact:{g:{dist:12.5,ty:-.6,pit:.15},sg:{x:0,y:-3,s:1}},hanoi:{g:{dist:19,tx:2.6,ty:.8,pit:.25},sg:{x:10.2,y:-2.6,s:.55}}};
+function setMode(m){M=m;document.body.classList.toggle('q',m=='quiz');document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.m==m));
+if(m=='quiz'){setPlay(false);return renderQuiz()}
+const z=SZ[m];$('#sz').innerHTML=z.o.map(v=>`<option value="${v}"${v==z.d?' selected':''}>${z.f(v)}</option>`).join('');$('#intro').innerHTML=INTRO[m];renderCode();build();setTimeout(rsz,0)}
+function build(){const v=+$('#sz').value;gen=GEN[M](v);steps=gen.steps;init=gen.init;i=-1;setPlay(false);
+TG.visible=M=='fib';HG.visible=M=='hanoi';Object.assign(G,{yaw:0,pit:.15,tx:0,ty:-.6});let c;
+if(M=='fib'){const mx=Math.max(...gen.nodes.map(n=>n.x));buildTree(gen.nodes,v);TS=init;const sx=mx/2*1.7+3.3;c={g:{dist:10+v*2.6,ty:0,tx:sx*.3,pit:.05},sg:{x:sx,y:-v*.5-.5,s:.6}}}
+else{c=CFG[M];if(M=='hanoi')buildHanoi(v,init.P)}
+Object.assign(G,{tx:0,ty:0},c.g);Object.assign(sg,c.sg);$('#sl').max=steps.length;apply()}
+function apply(){const s=i<0?init:steps[i];$('#msg').innerHTML=`<b>${i<0?'Ready':'Step '+(i+1)+' of '+steps.length}</b><br><span id="mt"></span>`;$('#mt').textContent=s.text;
+syncStack(s.st);if(M=='fib')TS=s;if(M=='hanoi')setPegs(s.P);
+document.querySelectorAll('#pre div').forEach((d,j)=>d.classList.toggle('on',j==s.line));$('#sl').value=i+1;
+$('#pv').disabled=i<0;$('#rs').disabled=i<0;$('#nx').disabled=i>=steps.length-1}
+function go(n){i=Math.max(-1,Math.min(steps.length-1,n));last=performance.now();apply()}
+function setPlay(p){playing=p;$('#pl').textContent=p?'⏸ Pause':'▶ Play';last=performance.now()}
+function renderCode(){document.querySelectorAll('#lt button').forEach(b=>b.classList.toggle('on',b.dataset.l==lang));const pre=$('#pre');pre.innerHTML='';
+CODE[M][lang].split('\n').forEach((l,j)=>{const d=document.createElement('div'),n=document.createElement('span');n.textContent=j+1;d.append(n,l);pre.append(d)});if(steps.length)apply()}
+$('#tabs').onclick=e=>{if(e.target.dataset.m)setMode(e.target.dataset.m)};
+$('#lt').onclick=e=>{if(e.target.dataset.l){lang=e.target.dataset.l;renderCode()}};
+$('#rs').onclick=()=>{setPlay(false);go(-1)};$('#pv').onclick=()=>{setPlay(false);go(i-1)};$('#nx').onclick=()=>{setPlay(false);go(i+1)};
+$('#pl').onclick=()=>{if(!playing&&i>=steps.length-1)go(-1);setPlay(!playing)};$('#sl').oninput=e=>{setPlay(false);go(+e.target.value-1)};$('#sz').onchange=build;
+addEventListener('keydown',e=>{if(M=='quiz'||/BUTTON|SELECT|INPUT/.test(e.target.tagName))return;if(e.key=='ArrowRight')$('#nx').click();else if(e.key=='ArrowLeft')$('#pv').click();else if(e.key==' '){e.preventDefault();$('#pl').click()}});
+// quiz
+const Q=[{q:'What is a base case?',o:['The step that calls the function again','The condition that stops the recursion','The first line of every program','A special kind of loop'],a:1,e:'The base case is the simplest problem, answered directly, so the calls stop piling up.'},
+{q:'What happens if a recursive function has no base case?',o:['It finishes instantly','It always returns 0','It keeps calling itself until the stack overflows','It turns into a loop'],a:2,e:'Without a stopping point, new frames keep landing on the call stack until memory runs out (stack overflow).'},
+{q:'In the call stack, which frame finishes first?',o:['The first call made','The one in the middle','The top one, the most recent call','All at the same time'],a:2,e:'The stack is last in, first out. The newest call (the base case) returns first.'},
+{q:'What is 4! (computed as 4 × 3!)?',o:['12','24','10','16'],a:1,e:'4 × 3 × 2 × 1 = 24.'},
+{q:'With fib(0)=0 and fib(1)=1, what is fib(5)?',o:['3','5','8','13'],a:1,e:'The sequence is 0, 1, 1, 2, 3, 5, so fib(5) = 5.'},
+{q:'Minimum moves to solve Tower of Hanoi with 3 disks?',o:['6','7','8','9'],a:1,e:'The minimum is 2ⁿ − 1, so with 3 disks it is 7 moves.'}];
+let qi=0,qs=0,qd=false;
+function renderQuiz(){const q=$('#quiz');qd=false;if(qi>=Q.length){q.innerHTML=`<h2>🏆 Your score: ${qs} / ${Q.length}</h2><p>${qs>=5?'Recursion master! You really get it.':qs>=3?'Nice work! Replay the visualizations to lock it in.':'Good start! Watch the call stack again and retry.'}</p><button id="qr" class="on">Try again</button>`;$('#qr').onclick=()=>{qi=qs=0;renderQuiz()};return}
+const c=Q[qi];q.innerHTML=`<div class="qh">Question ${qi+1} of ${Q.length} · Score ${qs}</div><h2>${c.q}</h2>${c.o.map((o,j)=>`<button class="opt" data-j="${j}">${o}</button>`).join('')}<p id="qe"></p><button id="qn" class="on" hidden>${qi==Q.length-1?'See score':'Next →'}</button>`;
+q.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{if(qd)return;qd=true;const j=+b.dataset.j;if(j==c.a)qs++;b.classList.add(j==c.a?'ok':'no');q.querySelectorAll('.opt')[c.a].classList.add('ok');$('#qe').textContent=(j==c.a?'✅ Correct! ':'❌ Not quite. ')+c.e;$('#qn').hidden=false});
+$('#qn').onclick=()=>{qi++;renderQuiz()}}
+// loop
+function rsz(){const w=cv.clientWidth,h=cv.clientHeight;if(!w)return;R.setSize(w,h);cam.aspect=w/h;cam.updateProjectionMatrix()}
+new ResizeObserver(rsz).observe(cv);
+function loop(now){requestAnimationFrame(loop);if(M=='quiz')return;const t=now/1000;
+for(const k in V)V[k]+=(G[k]-V[k])*.06;
+SG.position.x+=(sg.x-SG.position.x)*.08;SG.position.y+=(sg.y-SG.position.y)*.08;SG.scale.setScalar(SG.scale.x+(sg.s-SG.scale.x)*.08);
+const y=V.yaw+Math.sin(t/6)*.05;cam.position.set(V.tx+V.dist*Math.sin(y)*Math.cos(V.pit),V.ty+V.dist*Math.sin(V.pit),V.tz+V.dist*Math.cos(y)*Math.cos(V.pit));cam.lookAt(V.tx,V.ty,V.tz);
+stars.rotation.y=t*.01;L1.position.x=-10+Math.sin(t)*5;
+stk.forEach(o=>{o.g.position.y+=(o.i-o.g.position.y)*.14;o.g.scale.setScalar(o.g.scale.x+(1-o.g.scale.x)*.14);o.m.emissiveIntensity=o.top?.85+.3*Math.sin(t*4):.3});
+dead=dead.filter(o=>{o.g.position.y+=.16;o.g.scale.multiplyScalar(.88);if(o.g.scale.x<.05){SG.remove(o.g);return false}return true});
+if(M=='fib'&&TS)animTree();if(M=='hanoi')animHanoi();
+if(playing&&now-last>DL[$('#spd').value]){if(i<steps.length-1)go(i+1);else setPlay(false)}
+R.render(sc,cam)}
+setMode('learn');requestAnimationFrame(loop);
+</script></body></html>
